@@ -123,13 +123,6 @@ object examples {
       .json("data/input/tours.json")
     toursDF.show
 
-    println(toursDF
-      .select(explode($"tourTags"))
-      .groupBy("col")
-      .count()
-      .count()
-    )
-
     toursDF
       .select($"tourDifficulty")
       .groupBy($"tourDifficulty")
