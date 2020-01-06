@@ -4,7 +4,7 @@ import org.apache.spark.sql.functions._
 import spark_helpers.SessionBuilder
 
 object examples {
-  def exec1(): Unit ={
+  /*def exec1(): Unit ={
     val spark = SessionBuilder.buildSession()
     import spark.implicits._
 
@@ -111,5 +111,67 @@ object examples {
       .drop("salary8")
       .drop("code")
       .show
+  }*/
+
+  def exec4(): Unit = {
+    val spark = SessionBuilder.buildSession()
+    import spark.implicits._
+
+    val toursDF = spark.read
+      .option("multiline", true)
+      .option("mode", "PERMISSIVE")
+      .json("data/input/tours.json")
+    toursDF.show
+
+    println(toursDF
+      .select(explode($"tourTags"))
+      .groupBy("col")
+      .count()
+      .count()
+    )
+
+    toursDF
+      .select($"tourDifficulty")
+      .groupBy($"tourDifficulty")
+      .count()
+      .orderBy($"count".desc)
+        .show
+
+    toursDF
+      .select(min($"tourPrice"),max($"tourPrice"),avg($"tourPrice"))
+      .show
+
+    toursDF
+      .groupBy($"tourDifficulty")
+        .agg(min($"tourPrice"),max($"tourPrice"),avg($"tourPrice"))
+        .show
+
+    toursDF
+      .groupBy($"tourDifficulty")
+      .agg(min($"tourPrice"),max($"tourPrice"),avg($"tourPrice"),min($"tourLength"),max($"tourLength"),avg($"tourLength"))
+      .show
+
+    toursDF
+      .select(explode($"tourTags"))
+      .groupBy($"col")
+      .count()
+      .orderBy($"count".desc)
+      .show(10)
+
+    toursDF
+      .select(explode($"tourTags"), $"tourDifficulty")
+      .groupBy($"col", $"tourDifficulty")
+      .count()
+      .orderBy($"count".desc)
+      .show(10)
+
+    toursDF
+      .select(explode($"tourTags"), $"tourDifficulty", $"tourPrice")
+      .groupBy($"col", $"tourDifficulty")
+      .agg(min($"tourPrice"),max($"tourPrice"),avg($"tourPrice").as("avg"))
+      .orderBy($"avg".desc)
+      .show(15)
+
   }
+
 }
